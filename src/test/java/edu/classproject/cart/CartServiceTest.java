@@ -75,4 +75,44 @@ public class CartServiceTest {
             cartService.updateItem(cart.cartId(), "item1", 5);
         });
     }
+
+    //  7: Add same item twice (merge)
+    @Test
+    void testAddSameItemTwice() {
+        Cart cart = cartService.createCart("user1", "rest1");
+
+        cart = cartService.addItem(cart.cartId(), "item1", 2);
+        cart = cartService.addItem(cart.cartId(), "item1", 3);
+
+        assertEquals(1, cart.lines().size());
+        assertEquals(5, cart.lines().get(0).quantity());
+    }
+
+    //  8: Remove non-existing item
+    @Test
+    void testRemoveNonExistingItem() {
+        Cart cart = cartService.createCart("user1", "rest1");
+
+        cart = cartService.removeItem(cart.cartId(), "item1");
+
+        assertTrue(cart.lines().isEmpty());
+    }
+
+    // 9: Get existing cart
+    @Test
+    void testGetCart() {
+        Cart cart = cartService.createCart("user1", "rest1");
+
+        Cart fetched = cartService.getCart(cart.cartId());
+
+        assertEquals(cart.cartId(), fetched.cartId());
+    }
+
+    //  Get non-existing cart
+    @Test
+    void testGetNonExistingCart() {
+        assertThrows(RuntimeException.class, () -> {
+            cartService.getCart("invalid");
+        });
+    }
 }
